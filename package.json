@@ -1,7 +1,7 @@
 {
   "name": "vspn",
   "description": "open vscode on remote host",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Kyung Yeol Kim @chitacan",
   "bin": {
     "vspn": "./bin/run"
@@ -33,7 +33,10 @@
   "oclif": {
     "bin": "vspn"
   },
-  "repository": "chitacan/vspn",
+  "repository": {
+    "type": "git",
+    "url": "git+http://github.com/chitacan/vspn.git"
+  },
   "scripts": {
     "test": "echo NO TESTS"
   }

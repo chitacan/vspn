@@ -9,7 +9,7 @@ const {repository} = require('../package')
 class VspnCommand extends Command {
   async run() {
     const {flags, args} = this.parse(VspnCommand)
-    const [owner, repo] = (flags.slug || repository).split('/')
+    const [repo, owner] = (flags.slug || repository.url.replace('.git', '')).split('/').reverse()
     const slug = {owner, repo}
     const workflowFile = `run_vscode_${args.host}.yml`
     const self = hostname().replace('.local', '')
