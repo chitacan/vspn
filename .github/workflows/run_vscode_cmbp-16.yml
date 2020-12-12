@@ -1,0 +1,16 @@
+name: run vscode on cmbp-16
+on:
+  workflow_dispatch:
+    inputs:
+      host:
+        description: remote hostname to open vscode
+      path:
+        description: path to open in vscode
+
+jobs:
+  run_vscode:
+    runs-on: [self-hosted, cmbp-16]
+    steps:
+      - run: code -n --folder-uri vscode-remote://ssh-remote+${{ github.event.inputs.host }}${{ github.event.inputs.path }}
+        env:
+          RUNNER_TRACKING_ID: "" 

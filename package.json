@@ -1,0 +1,40 @@
+{
+  "name": "vspn",
+  "description": "open vscode on remote host",
+  "version": "0.0.1",
+  "author": "Kyung Yeol Kim @chitacan",
+  "bin": {
+    "vspn": "./bin/run"
+  },
+  "bugs": "https://github.com/chitacan/vspn/issues",
+  "dependencies": {
+    "@oclif/command": "^1.8.0",
+    "@oclif/config": "^1.17.0",
+    "@oclif/plugin-help": "^3.2.0",
+    "@octokit/rest": "^18.0.12",
+    "js-yaml": "^3.14.1"
+  },
+  "devDependencies": {
+    "@oclif/dev-cli": "^1.26.0"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "files": [
+    "/bin",
+    "/src"
+  ],
+  "homepage": "https://github.com/chitacan/vspn",
+  "keywords": [
+    "oclif"
+  ],
+  "license": "MIT",
+  "main": "src/index.js",
+  "oclif": {
+    "bin": "vspn"
+  },
+  "repository": "chitacan/vspn",
+  "scripts": {
+    "test": "echo NO TESTS"
+  }
+}

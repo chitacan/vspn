@@ -1,0 +1,16 @@
+name: run vscode on pmba
+on:
+  workflow_dispatch:
+    inputs:
+      host:
+        description: remote hostname to open vscode
+      path:
+        description: path to open in vscode
+
+jobs:
+  run_vscode:
+    runs-on: [self-hosted, pmba]
+    steps:
+      - run: code -n --folder-uri vscode-remote://ssh-remote+${{ github.event.inputs.host }}${{ github.event.inputs.path }}
+        env:
+          RUNNER_TRACKING_ID: "" 
