@@ -1,7 +1,7 @@
 {
   "name": "vspn",
   "description": "open vscode on remote host",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Kyung Yeol Kim @chitacan",
   "bin": {
     "vspn": "./bin/run"

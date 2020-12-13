@@ -13,6 +13,7 @@ class VspnCommand extends Command {
     const slug = {owner, repo}
     const workflowFile = `run_vscode_${args.host}.yml`
     const self = hostname().replace('.local', '')
+    const uri = `vscode-remote://ssh-remote+${self}${args.path}`
     const configPath = join(homedir(), '/.config/gh/config.yml')
 
     if (args.host === self) {
@@ -48,16 +49,14 @@ class VspnCommand extends Command {
         workflow_id: workflowFile,
         ref: 'master',
         inputs: {
-          host: self,
-          path: args.path
+          uri
         }
       })
     }
   }
 }
 
-VspnCommand.description = `open vscode on remote host
-`
+VspnCommand.description = `open vscode on remote host`
 
 VspnCommand.flags = {
   version: flags.version({char: 'v'}),
