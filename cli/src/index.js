@@ -14,7 +14,7 @@ class VspnCommand extends Command {
     const workflowFile = `run_vscode_${args.host}.yml`
     const self = hostname().replace('.local', '')
     const uri = `vscode-remote://ssh-remote+${self}${args.path}`
-    const configPath = join(homedir(), '/.config/gh/config.yml')
+    const configPath = join(homedir(), '/.config/gh/hosts.yml')
 
     if (args.host === self) {
       throw new Error(`open on ${self} is not allowed. (you are on ${self})`)
@@ -24,7 +24,7 @@ class VspnCommand extends Command {
       throw new Error(`cannot find gh config. install gh (https://cli.github.com/) and login first.`)
     }
     const config = safeLoad(readFileSync(configPath))
-    const auth = config.hosts['github.com'].oauth_token
+    const auth = config['github.com'].oauth_token
 
     const octokit = new Octokit({ auth })
 
@@ -56,7 +56,7 @@ class VspnCommand extends Command {
   }
 }
 
-VspnCommand.description = `open vscode on remote host`
+VspnCommand.description = `Open remote SSHed vscode on selected host`
 
 VspnCommand.flags = {
   version: flags.version({char: 'v'}),

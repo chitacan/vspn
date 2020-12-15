@@ -1,0 +1,34 @@
+{
+  "name": "vspn-ext",
+  "version": "0.0.0",
+  "manifest_version": 2,
+	"minimum_chrome_version": "80",
+	"permissions": [
+		"https://github.com/*/*",
+    "storage"
+  ],
+	"background": {
+		"scripts": [
+			"background.js"
+		]
+	},
+  "options_ui": {
+    "page": "option.html",
+    "open_in_tab": false
+  },
+	"content_scripts": [
+		{
+			"run_at": "document_start",
+			"matches": [
+				"https://github.com/*/*",
+				"https://github.com/*/*/pull/*"
+			],
+			"css": [
+				"vspn.css"
+			],
+			"js": [
+				"vspn.js"
+			]
+		}
+	]
+}
