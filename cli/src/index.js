@@ -4,7 +4,7 @@ const {safeLoad} = require('js-yaml')
 const {homedir, hostname} = require('os')
 const {join, basename} = require('path')
 const {readFileSync, existsSync} = require('fs')
-const {repository} = require('../package')
+const {description, repository} = require('../package')
 
 class VspnCommand extends Command {
   async run() {
@@ -56,7 +56,7 @@ class VspnCommand extends Command {
   }
 }
 
-VspnCommand.description = `Open remote SSHed vscode on selected host`
+VspnCommand.description = `${description}`
 
 VspnCommand.flags = {
   version: flags.version({char: 'v'}),

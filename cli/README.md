@@ -1,6 +1,6 @@
 # vspn
 
-Open remote SSHed vscode on selected host
+Open remote SSHed vscode on self-hosted runner.
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 [![Version](https://img.shields.io/npm/v/vspn.svg)](https://npmjs.org/package/vspn)

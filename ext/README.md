@@ -1,6 +1,7 @@
 # extension
 
-vspn chrome extension for github. This will add `Open with vspn` button on repo main & pull request page.
+Open github repo in vscode.
+It will add `Open with vspn` button on GitHub repo main & pull request page.
 
 <kbd>![image](https://user-images.githubusercontent.com/286950/102258103-e8c39f00-3f50-11eb-9e68-f55c8d9202b2.png)</kbd>
 

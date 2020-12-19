@@ -1,6 +1,6 @@
 # vspn
 
-Tools for easy open vscode
+Open vscode on self-hosted runner.
 
 * [cli](./cli)
 * [ext](./ext)
