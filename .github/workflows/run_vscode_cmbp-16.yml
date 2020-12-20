@@ -2,6 +2,10 @@ name: run vscode on cmbp-16
 on:
   workflow_dispatch:
     inputs:
+      repo:
+        description: repo
+      branch:
+        description: branch
       uri:
         description: uri to open with vscode
 
@@ -9,6 +13,24 @@ jobs:
   run_vscode:
     runs-on: [self-hosted, cmbp-16]
     steps:
-      - run: code -n --folder-uri ${{ github.event.inputs.uri }}
+      - name: checkout
+        if: ${{ github.event.inputs.repo }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.repo }}
+          ref: ${{ github.event.inputs.branch }}
+          path: ${{ github.event.inputs.repo }}/${{ github.event.inputs.branch }}
+          token: ${{ secrets.PUBLISH_TOKEN }}
+          fetch-depth: 2
+
+      - name: open workspace
+        if: ${{ github.event.inputs.repo }}
+        run: code -n --folder-uri ${{ github.workspace }}/${{ github.event.inputs.repo }}/${{ github.event.inputs.branch }}
         env:
-          RUNNER_TRACKING_ID: "" 
+          RUNNER_TRACKING_ID: ""
+
+      - name: open uri
+        if: ${{ github.event.inputs.uri }}
+        run: code -n --folder-uri ${{ github.event.inputs.uri }}
+        env:
+          RUNNER_TRACKING_ID: ""
