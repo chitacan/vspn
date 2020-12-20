@@ -20,7 +20,7 @@ jobs:
           repository: ${{ github.event.inputs.repo }}
           ref: ${{ github.event.inputs.branch }}
           path: ${{ github.event.inputs.repo }}/${{ github.event.inputs.branch }}
-          token: ${{ secrets.PUBLISH_TOKEN }}
+          token: ${{ secrets.REPO_TOKEN }}
           fetch-depth: 2
 
       - name: open workspace

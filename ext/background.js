@@ -1,10 +1,12 @@
 const GH_API = 'https://api.github.com'
 
-async function getOptions() {
+async function getOptions(autoOptnOption = false) {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get(['token', 'host', 'runner_repo'], (result) => {
+    chrome.storage.local.get(['token', 'host'], (result) => {
       if (!result.token && !result.host) {
-        chrome.runtime.openOptionsPage()
+        if (autoOptnOption) {
+          chrome.runtime.openOptionsPage()
+        }
         reject('no options')
       } else {
         resolve(result)
@@ -16,8 +18,9 @@ async function getOptions() {
 async function workflowDispatch(path, headRef) {
   console.log(path, headRef)
 
-  const {host, token, runner_repo} = await getOptions();
+  const {host, token} = await getOptions(true);
   const [repo, branch] = headRef.split(':')
+  const runner_repo = 'chitacan/vspn'
   const workflowId = `run_vscode_${host}.yml`
 
   await fetch(`${GH_API}/repos/${runner_repo}/actions/workflows/${workflowId}/dispatches`, {
@@ -68,14 +71,19 @@ async function workflowDispatch(path, headRef) {
   })
 }
 
-chrome.runtime.onMessage.addListener(({command, path, headRef}, sender, send) => {
-  if (command === 'OPEN_VSCODE') {
-    workflowDispatch(path, headRef)
+chrome.runtime.onMessage.addListener((message, sender, send) => {
+  console.log(message)
+  if (message.command === 'OPEN_VSCODE') {
+    workflowDispatch(message.path, message.headRef)
       .then(() => send(true))
       .catch(err => {
         console.error(err)
         send(false)
       })
+  } else if (message.command === 'CHECK_OPTION') {
+    getOptions()
+      .then(() => send(true))
+      .catch(() => send(false))
   }
 
   return true

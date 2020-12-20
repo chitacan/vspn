@@ -16,7 +16,7 @@ function getPage() {
       btn: 'btn-md',
       ref: () => {
         const branch = document.querySelector('#branch-select-menu > summary > span').textContent
-        const [owner, repo] = location.pathname.split('/')
+        const [owner, repo] = location.pathname.replace('/', '').split('/')
         return `${owner}/${repo}:${branch}`
       },
       insert: (parent, node) => parent.insertBefore(node, document.querySelector(".file-navigation > a[data-hotkey='t']"))
@@ -37,7 +37,7 @@ function htmlToElement(html) {
 }
 
 async function elementReady(selector) {
-  return await new Promise(resolve => {
+  return new Promise(resolve => {
     if (!selector) {
       return
     }
@@ -52,6 +52,14 @@ async function elementReady(selector) {
   })
 }
 
+async function optionReady() {
+  return new Promise(resolve => {
+    chrome.runtime.sendMessage({command: 'CHECK_OPTION'}, res => {
+      resolve(res)
+    })
+  })
+}
+
 (async () => {
   console.log('from vspn')
 
@@ -63,6 +71,10 @@ async function elementReady(selector) {
       btn.classList.add(page.btn)
       page.insert(target, btn)
     })
+
+  await optionReady().then(enabled => {
+    btn.disabled = !enabled
+  })
 
   const headRef = page.ref()
   const spinner$ = htmlToElement(`<svg class="octicon anim-rotate js-check-step-loader mr-2 flex-shrink-0" width="16" height="16" viewBox="0 0 16 16" stroke="#dbab0a" xmlns="http://www.w3.org/2000/svg">
