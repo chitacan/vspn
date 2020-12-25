@@ -21,7 +21,7 @@ jobs:
           ref: ${{ github.event.inputs.branch }}
           path: ${{ github.event.inputs.repo }}/${{ github.event.inputs.branch }}
           token: ${{ secrets.REPO_TOKEN }}
-          fetch-depth: 2
+          fetch-depth: 50
 
       - name: open workspace
         if: ${{ github.event.inputs.repo }}
