@@ -8,6 +8,9 @@ on:
         description: branch
       uri:
         description: uri to open with vscode
+      goto:
+        description: open file
+        default: ''
 
 jobs:
   run_vscode:
@@ -25,12 +28,17 @@ jobs:
 
       - name: open workspace
         if: ${{ github.event.inputs.repo }}
-        run: code -n --folder-uri ${{ github.workspace }}/${{ github.event.inputs.repo }}/${{ github.event.inputs.branch }}
+        run: |
+          code -n \
+          --folder-uri ${{ github.workspace }}/${{ github.event.inputs.repo }}/${{ github.event.inputs.branch }} \
+          --goto ${{ github.workspace }}/${{ github.event.inputs.goto }}
         env:
           RUNNER_TRACKING_ID: ""
 
       - name: open uri
         if: ${{ github.event.inputs.uri }}
-        run: code -n --folder-uri ${{ github.event.inputs.uri }}
+        run: |
+          code -n \
+          --folder-uri ${{ github.event.inputs.uri }}
         env:
           RUNNER_TRACKING_ID: ""

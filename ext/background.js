@@ -15,7 +15,7 @@ async function getOptions(autoOptnOption = false) {
   })
 }
 
-async function workflowDispatch(path, headRef) {
+async function workflowDispatch(path, headRef, goto) {
   console.log(path, headRef)
 
   const {host, token} = await getOptions(true);
@@ -33,7 +33,8 @@ async function workflowDispatch(path, headRef) {
       ref: 'master',
       inputs: {
         repo,
-        branch
+        branch,
+        goto
       }
     })
   })
@@ -74,7 +75,7 @@ async function workflowDispatch(path, headRef) {
 chrome.runtime.onMessage.addListener((message, sender, send) => {
   console.log(message)
   if (message.command === 'OPEN_VSCODE') {
-    workflowDispatch(message.path, message.headRef)
+    workflowDispatch(message.path, message.headRef, message.goto)
       .then(() => send(true))
       .catch(err => {
         console.error(err)
