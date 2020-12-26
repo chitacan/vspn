@@ -7,9 +7,7 @@ It will add `Open with vspn` button on GitHub repo main & pull request page.
 
 <kbd>![image](https://user-images.githubusercontent.com/286950/102258048-d34e7500-3f50-11eb-8358-a28508dbf10b.png)</kbd>
 
-## See how it works
-
-<kbd><img width="500" src="https://user-images.githubusercontent.com/286950/102253229-6637e100-3f4a-11eb-8fee-d6d70bb89ac7.gif"/></kbd>
+<kbd>![image](https://user-images.githubusercontent.com/286950/103144360-a7f73180-476b-11eb-995e-83eb9f2f00b8.png)</kbd>
 
 ## development
 
