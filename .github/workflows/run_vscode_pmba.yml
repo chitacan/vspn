@@ -1,4 +1,4 @@
-name: run vscode on pmbp
+name: run vscode on pmba
 on:
   workflow_dispatch:
     inputs:
@@ -14,7 +14,7 @@ on:
 
 jobs:
   run_vscode:
-    runs-on: [self-hosted, pmbp]
+    runs-on: [self-hosted, pmba]
     steps:
       - name: checkout
         if: ${{ github.event.inputs.repo }}
