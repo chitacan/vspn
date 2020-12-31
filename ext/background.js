@@ -30,6 +30,17 @@ async function workflowDispatch({path, headRef, goto}) {
   const [repo, branch] = headRef.split(':')
   const runner_repo = 'chitacan/vspn'
   const workflowId = `run_vscode_${host}.yml`
+  const body = {
+    ref: 'master',
+    inputs: {
+      requestId,
+      repo,
+      branch,
+      goto
+    }
+  }
+
+  console.log('dispatching', body)
 
   await fetch(`${GH_API}/repos/${runner_repo}/actions/workflows/${workflowId}/dispatches`, {
     method: 'POST',
@@ -37,15 +48,7 @@ async function workflowDispatch({path, headRef, goto}) {
       Authorization: `token ${token}`,
       Accept: 'application/vnd.github.v3+json'
     },
-    body: JSON.stringify({
-      ref: 'master',
-      inputs: {
-        requestId,
-        repo,
-        branch,
-        goto
-      }
-    })
+    body: JSON.stringify(body)
   })
 
   await new Promise(resolve => {
@@ -65,7 +68,6 @@ async function workflowDispatch({path, headRef, goto}) {
 }
 
 chrome.runtime.onMessage.addListener((message, sender, send) => {
-  console.log(message)
   if (message.command === 'OPEN_VSCODE') {
     workflowDispatch(message)
       .then(() => send(true))

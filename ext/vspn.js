@@ -23,10 +23,10 @@ function getPageOptions() {
       btnClass: ['btn-sm', 'mr-1'],
       findRef: () => document.querySelector(':not(.sticky-content) .commit-ref.head-ref').title,
       insert: (parent, node) => parent.prepend(node),
-      getFile: () => {
+      getFilePath: () => {
         const [, , , , pullRequestTab] = getSplitPath()
         if (pullRequestTab === 'files' && location.hash !== '') {
-          return document.querySelector(`.file-info a[href='${location.hash}']`).textContent
+          return document.querySelector(`.file-info a[href='${location.hash}']`).textContent.split('/')
         }
       }
     }
@@ -38,15 +38,17 @@ function getPageOptions() {
       target: () => document.querySelector("a[data-hotkey='t']").parentElement,
       btnClass: ['btn-md', 'mr-2'],
       findRef: () => {
-        const branch = document.querySelector('#branch-select-menu > summary > span').textContent
+        const branch = document.querySelector('#branch-select-menu > summary').title
         const [owner, repo] = getSplitPath()
         return `${owner}/${repo}:${branch}`
       },
       insert: (parent, node) => parent.insertBefore(node, document.querySelector("a[data-hotkey='t']")),
-      getFile: () => {
-        const [, , gitObject, ref, ...paths] = getSplitPath()
+      getFilePath: () => {
+        const [, owner, repo, gitObject, ref, ...paths] = document.querySelector("a[data-hotkey='y']").pathname.split('/')
         if (gitObject === 'blob') {
-          return paths.join('/')
+          return paths
+        } else {
+          return []
         }
       }
     }
@@ -116,12 +118,12 @@ async function init() {
 
   btn.prepend(icon$)
   btn.addEventListener('click', () => {
-    const goto = pageOption.getFile()
+    const paths = pageOption.getFilePath()
     const message = {
       command: 'OPEN_VSCODE',
       path: location.pathname,
       headRef,
-      goto
+      goto: [...headRef.split(':'), ...paths].join('/')
     }
     btn.replaceChild(spinner$, icon$)
     btn.disabled = true
@@ -155,12 +157,14 @@ async function initPullRequestFiles() {
       btn.classList.add('pl-5', 'dropdown-item', 'btn-link', 'vspn')
       btn.textContent = 'Open with vspn'
       btn.addEventListener('click', () => {
-        const [, , , , , ...paths] = node
-          .previousElementSibling
-          .previousElementSibling
-          .previousElementSibling
-          .previousElementSibling
-          .pathname
+        const paths = node
+          .parentElement
+          .parentElement
+          .parentElement
+          .parentElement
+          .parentElement
+          .querySelector('clipboard-copy')
+          .getAttribute('value')
           .split('/')
         const goto = [...headRef.split(':'), ...paths].join('/')
         const message = {
