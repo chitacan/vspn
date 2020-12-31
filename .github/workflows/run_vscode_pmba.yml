@@ -2,6 +2,9 @@ name: run vscode on pmba
 on:
   workflow_dispatch:
     inputs:
+      requestId:
+        description: request id
+        default: ''
       repo:
         description: repo
       branch:
@@ -16,6 +19,12 @@ jobs:
   run_vscode:
     runs-on: [self-hosted, pmba]
     steps:
+      - name: status started
+        run: |
+          curl -d '{"requestId": "${{ github.event.inputs.requestId }}", "status": "started"}' \
+              -H "Content-Type: application/json" \
+              -X POST https://vspn.chitacan.io/api/status
+
       - name: checkout
         if: ${{ github.event.inputs.repo }}
         uses: actions/checkout@v2
@@ -26,7 +35,15 @@ jobs:
           token: ${{ secrets.REPO_TOKEN }}
           fetch-depth: 50
 
+      - name: status checkout
+        run: |
+          curl -d '{"requestId": "${{ github.event.inputs.requestId }}", "status": "checkout"}' \
+              -H "Content-Type: application/json" \
+              -X POST https://vspn.chitacan.io/api/status
+
       - name: open workspace
+        id: open_workspace
+        continue-on-error: true
         if: ${{ github.event.inputs.repo }}
         run: |
           code -n \
@@ -36,9 +53,25 @@ jobs:
           RUNNER_TRACKING_ID: ""
 
       - name: open uri
+        id: open_uri
+        continue-on-error: true
         if: ${{ github.event.inputs.uri }}
         run: |
           code -n \
           --folder-uri ${{ github.event.inputs.uri }}
         env:
           RUNNER_TRACKING_ID: ""
+
+      - name: open workspace outcome
+        if: ${{ github.event.inputs.repo }}
+        run: |
+          curl -d '{"requestId": "${{ github.event.inputs.requestId }}", "status": "${{ steps.open_workspace.outcome }}"}' \
+              -H "Content-Type: application/json" \
+              -X POST https://vspn.chitacan.io/api/status
+
+      - name: open uri outcome
+        if: ${{ github.event.inputs.uri }}
+        run: |
+          curl -d '{"requestId": "${{ github.event.inputs.requestId }}", "status": "${{ steps.open_uri.outcome }}"}' \
+              -H "Content-Type: application/json" \
+              -X POST https://vspn.chitacan.io/api/status

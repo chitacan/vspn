@@ -3,6 +3,7 @@ const {Octokit} = require("@octokit/rest")
 const {safeLoad} = require('js-yaml')
 const {homedir, hostname} = require('os')
 const {join, basename} = require('path')
+const {createHash} = require('crypto')
 const {readFileSync, existsSync} = require('fs')
 const {description, repository} = require('../package')
 
@@ -14,7 +15,9 @@ class VspnCommand extends Command {
     const workflowFile = `run_vscode_${args.host}.yml`
     const self = hostname().replace('.local', '')
     const uri = `vscode-remote://ssh-remote+${self}${args.path}`
+    const requestId = createHash('sha1').update(uri + new Date()).digest('hex')
     const configPath = join(homedir(), '/.config/gh/hosts.yml')
+
 
     if (args.host === self) {
       throw new Error(`open on ${self} is not allowed. (you are on ${self})`)
@@ -49,6 +52,7 @@ class VspnCommand extends Command {
         workflow_id: workflowFile,
         ref: 'master',
         inputs: {
+          requestId,
           uri
         }
       })

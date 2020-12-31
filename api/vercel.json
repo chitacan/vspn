@@ -1,0 +1,20 @@
+{
+  "regions": ["icn1"],
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "https://github.com/chitacan/vspn"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,POST" },
+        { "key": "Access-Control-Allow-Headers", "value": "Accept, Content-Type" }
+      ]
+    }
+  ]
+}

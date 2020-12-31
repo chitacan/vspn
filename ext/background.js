@@ -1,5 +1,12 @@
 const GH_API = 'https://api.github.com'
 
+async function digestMessage(message) {
+  const msgUint8 = new TextEncoder().encode(message)
+  const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
 async function getOptions(autoOptnOption = false) {
   return new Promise((resolve, reject) => {
     chrome.storage.local.get(['token', 'host'], (result) => {
@@ -15,9 +22,10 @@ async function getOptions(autoOptnOption = false) {
   })
 }
 
-async function workflowDispatch(path, headRef, goto) {
+async function workflowDispatch({path, headRef, goto}) {
   console.log(path, headRef)
 
+  const requestId = await digestMessage(`${path},${headRef}`)
   const {host, token} = await getOptions(true);
   const [repo, branch] = headRef.split(':')
   const runner_repo = 'chitacan/vspn'
@@ -32,6 +40,7 @@ async function workflowDispatch(path, headRef, goto) {
     body: JSON.stringify({
       ref: 'master',
       inputs: {
+        requestId,
         repo,
         branch,
         goto
@@ -39,43 +48,26 @@ async function workflowDispatch(path, headRef, goto) {
     })
   })
 
-  // find workflow_run
-  const workflowRun = await new Promise(resolve => {
-    const id = setInterval(async () => {
-      const {workflow_runs} = await fetch(`${GH_API}/repos/${runner_repo}/actions/workflows/${workflowId}/runs?status=in_progress`, {
-        headers: {
-          Authorization: `token ${token}`,
-        }
-      })
-      .then(d => d.json());
-      if (workflow_runs.length > 0) {
-        clearInterval(id)
-        resolve(workflow_runs[0])
-      }
-    }, 3500)
-  })
-
-  // check workflow_run completed
   await new Promise(resolve => {
     const id = setInterval(async () => {
-      const {status} = await fetch(`${GH_API}/repos/${runner_repo}/actions/runs/${workflowRun.id}`, {
-        headers: {
-          Authorization: `token ${token}`
-        }
-      })
+      const {status} = await fetch(`https://vspn.chitacan.io/api/status?requestId=${requestId}`)
       .then(d => d.json());
-      if (status === 'completed') {
+
+      if (status === 'success') {
         clearInterval(id)
         resolve()
+      } else if (status === 'failure') {
+        clearInterval(id)
+        reject()
       }
-    }, 3500)
+    }, 3000)
   })
 }
 
 chrome.runtime.onMessage.addListener((message, sender, send) => {
   console.log(message)
   if (message.command === 'OPEN_VSCODE') {
-    workflowDispatch(message.path, message.headRef, message.goto)
+    workflowDispatch(message)
       .then(() => send(true))
       .catch(err => {
         console.error(err)
