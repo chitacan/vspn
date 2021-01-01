@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "vercel dev",
     "deploy": "vercel --prod",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
