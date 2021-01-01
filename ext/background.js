@@ -63,7 +63,7 @@ async function workflowDispatch({path, headRef, goto}) {
         clearInterval(id)
         reject()
       }
-    }, 3000)
+    }, 2000)
   })
 }
 

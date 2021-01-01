@@ -1,9 +1,11 @@
 const {Command, flags} = require('@oclif/command')
+const {cli} = require('cli-ux')
 const {Octokit} = require("@octokit/rest")
 const {safeLoad} = require('js-yaml')
 const {homedir, hostname} = require('os')
 const {join, basename} = require('path')
 const {createHash} = require('crypto')
+const fetch = require('node-fetch')
 const {readFileSync, existsSync} = require('fs')
 const {description, repository} = require('../package')
 
@@ -17,7 +19,6 @@ class VspnCommand extends Command {
     const uri = `vscode-remote://ssh-remote+${self}${args.path}`
     const requestId = createHash('sha1').update(uri + new Date()).digest('hex')
     const configPath = join(homedir(), '/.config/gh/hosts.yml')
-
 
     if (args.host === self) {
       throw new Error(`open on ${self} is not allowed. (you are on ${self})`)
@@ -47,6 +48,7 @@ class VspnCommand extends Command {
     }
 
     if (!flags['dry-run']) {
+      cli.action.start('starting')
       await octokit.actions.createWorkflowDispatch({
         ...slug,
         workflow_id: workflowFile,
@@ -55,6 +57,25 @@ class VspnCommand extends Command {
           requestId,
           uri
         }
+      })
+      cli.action.task.action = 'workflow dispatched'
+
+      await new Promise((resolve, reject) => {
+        const id = setInterval(async () => {
+          const {status} = await fetch(`https://vspn.chitacan.io/api/status?requestId=${requestId}`)
+            .then(res => res.json())
+          cli.action.task.action = `runner status: ${status}`
+
+          if (status === 'success') {
+            clearInterval(id)
+            cli.action.stop('done')
+            resolve()
+          } else if (status === 'failure') {
+            clearInterval(id)
+            cli.action.stop('error')
+            reject()
+          }
+        }, 2000)
       })
     }
   }
