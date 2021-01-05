@@ -1,8 +1,8 @@
 # vspn
 
-Open vscode on self-hosted runner.
+> Open vscode on [self-hosted runner](https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/about-self-hosted-runners).
 
-## See how ti works
+## How it works
 
 [cli](./cli)
 
