@@ -1,0 +1,16 @@
+name: 'vscode'
+description: 'run vscode with directory'
+inputs:
+  repo:
+    description: repo
+  branch:
+    description: branch
+  goto:
+    description: open file
+    default: ''
+  uri:
+    description: uri to open with vscode
+
+runs:
+  using: node12
+  main: dist/index.js

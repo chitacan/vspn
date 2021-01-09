@@ -1,0 +1,18 @@
+name: 'status'
+description: 'update vspn status'
+inputs:
+  requestId:
+    description: request id
+    required: true
+  status:
+    description: status to update
+
+runs:
+  using: "composite"
+  steps: 
+    - name: status started
+      run: |
+        curl -d '{"requestId": "${{ github.event.inputs.requestId }}", "status": "${{ github.event.inputs.status }}"}' \
+            -H "Content-Type: application/json" \
+            -X POST https://vspn.chitacan.io/api/status
+      shell: bash
