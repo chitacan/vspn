@@ -4,7 +4,7 @@ on:
     inputs:
       requestId:
         description: request id
-        default: ''
+        required: true
       repo:
         description: repo
       branch:
@@ -20,10 +20,10 @@ jobs:
     runs-on: [self-hosted, pmba]
     steps:
       - name: status started
-        run: |
-          curl -d '{"requestId": "${{ github.event.inputs.requestId }}", "status": "started"}' \
-              -H "Content-Type: application/json" \
-              -X POST https://vspn.chitacan.io/api/status
+        uses: chitacan/vspn/actions/status@master
+        with:
+          requestId: ${{ github.event.inputs.requestId }}
+          status: started
 
       - name: checkout
         if: ${{ github.event.inputs.repo }}
@@ -36,42 +36,26 @@ jobs:
           fetch-depth: 50
 
       - name: status checkout
-        run: |
-          curl -d '{"requestId": "${{ github.event.inputs.requestId }}", "status": "checkout"}' \
-              -H "Content-Type: application/json" \
-              -X POST https://vspn.chitacan.io/api/status
-
-      - name: open workspace
-        id: open_workspace
-        continue-on-error: true
         if: ${{ github.event.inputs.repo }}
-        run: |
-          code -n \
-          --folder-uri ${{ github.workspace }}/${{ github.event.inputs.repo }}/${{ github.event.inputs.branch }} \
-          --goto ${{ github.workspace }}/${{ github.event.inputs.goto }}
+        uses: chitacan/vspn/actions/status@master
+        with:
+          requestId: ${{ github.event.inputs.requestId }}
+          status: checkout
+
+      - name: open vscode
+        id: open_vscode
+        uses: chitacan/vspn/actions/vscode@master
+        continue-on-error: true
+        with:
+          uri: ${{ github.event.inputs.uri }}
+          repo: ${{ github.event.inputs.repo }}
+          goto: ${{ github.event.inputs.goto }}
+          branch: ${{ github.event.inputs.branch }}
         env:
           RUNNER_TRACKING_ID: ""
 
-      - name: open uri
-        id: open_uri
-        continue-on-error: true
-        if: ${{ github.event.inputs.uri }}
-        run: |
-          code -n \
-          --folder-uri ${{ github.event.inputs.uri }}
-        env:
-          RUNNER_TRACKING_ID: ""
-
-      - name: open workspace outcome
-        if: ${{ github.event.inputs.repo }}
-        run: |
-          curl -d '{"requestId": "${{ github.event.inputs.requestId }}", "status": "${{ steps.open_workspace.outcome }}"}' \
-              -H "Content-Type: application/json" \
-              -X POST https://vspn.chitacan.io/api/status
-
-      - name: open uri outcome
-        if: ${{ github.event.inputs.uri }}
-        run: |
-          curl -d '{"requestId": "${{ github.event.inputs.requestId }}", "status": "${{ steps.open_uri.outcome }}"}' \
-              -H "Content-Type: application/json" \
-              -X POST https://vspn.chitacan.io/api/status
+      - name: status result
+        uses: chitacan/vspn/actions/status@master
+        with:
+          requestId: ${{ github.event.inputs.requestId }}
+          status: ${{ steps.open_vscode.outputs.status }}

@@ -11,6 +11,10 @@ inputs:
   uri:
     description: uri to open with vscode
 
+outputs:
+  status:
+    description: result
+
 runs:
   using: node12
   main: dist/index.js

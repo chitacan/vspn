@@ -1,4 +1,4 @@
-const {getInput, setFailed} = require("@actions/core");
+const {getInput, error, setOutput} = require("@actions/core");
 const {exec} = require("@actions/exec");
 const {join} = require('path');
 
@@ -10,22 +10,20 @@ const {join} = require('path');
     const uri = getInput('uri');
 
     if (!repo && !uri) {
-      setFailed("'repo' or 'uri' required.");
+      error("'repo' or 'uri' required.");
+      setOutput('status', 'failure');
       return;
     }
 
     const branch = getInput('branch');
     const goto = getInput('goto');
 
-    const folderUri = repo ?
-      join(workspace, repo, branch) :
-      getInput('uri');
-    const gotoPath = goto ?
-      join(workspace, goto) :
-      '';
+    const folderUri = repo ? join(workspace, repo, branch) : getInput('uri');
+    const gotoPath = (goto && goto !== '') ? ['--goto', join(workspace, goto)] : [];
 
-    await exec('code', ['-n', '--folder-uri', folderUri, '--goto', gotoPath]);
-  } catch (error) {
-    setFailed(error);
+    await exec('code', ['-n', '--folder-uri', folderUri, ...gotoPath]);
+    setOutput('status', 'success');
+  } catch (e) {
+    setOutput('status', 'failure');
   }
 })();

@@ -47,8 +47,6 @@ function getPageOptions() {
         const [, owner, repo, gitObject, ref, ...paths] = document.querySelector("a[data-hotkey='y']").pathname.split('/')
         if (gitObject === 'blob') {
           return paths
-        } else {
-          return []
         }
       }
     }
@@ -123,7 +121,7 @@ async function init() {
       command: 'OPEN_VSCODE',
       path: location.pathname,
       headRef,
-      goto: [...headRef.split(':'), ...paths].join('/')
+      goto: paths ? [...headRef.split(':'), ...paths].join('/') : paths
     }
     btn.replaceChild(spinner$, icon$)
     btn.disabled = true
