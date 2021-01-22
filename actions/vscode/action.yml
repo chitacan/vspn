@@ -10,6 +10,9 @@ inputs:
     default: ''
   uri:
     description: uri to open with vscode
+  command:
+    description: code or code-insiders
+    default: code
 
 outputs:
   status:

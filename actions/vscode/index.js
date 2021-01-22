@@ -8,6 +8,7 @@ const {join} = require('path');
 
     const repo = getInput('repo');
     const uri = getInput('uri');
+    const command = getInput('command');
 
     if (!repo && !uri) {
       error("'repo' or 'uri' required.");
@@ -21,9 +22,10 @@ const {join} = require('path');
     const folderUri = repo ? join(workspace, repo, branch) : getInput('uri');
     const gotoPath = (goto && goto !== '') ? ['--goto', join(workspace, goto)] : [];
 
-    await exec('code', ['-n', '--folder-uri', folderUri, ...gotoPath]);
+    await exec(command, ['-n', '--folder-uri', folderUri, ...gotoPath]);
     setOutput('status', 'success');
   } catch (e) {
+    error(e);
     setOutput('status', 'failure');
   }
 })();
