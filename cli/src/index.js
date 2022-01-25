@@ -101,7 +101,13 @@ VspnCommand.args = [
   },
   {
     name: 'path',
-    description: 'path to open in vscode',
+    description: 'target path or github url to open in vscode',
+    parse: (input) => {
+      if (input === '.') {
+        return process.cwd()
+      }
+      return resolve(process.cwd(), input)
+    },
     default: process.cwd()
   }
 ]
