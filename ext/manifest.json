@@ -7,21 +7,14 @@
 		"https://github.com/*/*",
     "storage"
   ],
-	"background": {
-		"scripts": [
-			"background.js"
-		]
-	},
-  "options_ui": {
-    "page": "option.html",
-    "open_in_tab": false
-  },
 	"content_scripts": [
 		{
 			"run_at": "document_start",
 			"matches": [
 				"https://github.com/*/*",
-				"https://github.com/*/*/pull/*"
+				"https://github.com/*/*/pull/*",
+				"https://github.com/*/*/commit/*",
+				"https://github.com/*/*/blob/*"
 			],
 			"css": [
 				"vspn.css"
