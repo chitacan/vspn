@@ -1,15 +1,12 @@
 name: 'vscode'
 description: 'run vscode with directory'
 inputs:
-  repo:
-    description: repo
-  branch:
-    description: branch
-  goto:
-    description: open file
-    default: ''
-  uri:
-    description: uri to open with vscode
+  path:
+    description: path
+  remote:
+    description: vscode's "--remote" option
+  folderUri:
+    description: vscode's "--folder-uri" option
   command:
     description: code or code-insiders
     default: code

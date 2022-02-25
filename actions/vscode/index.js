@@ -6,23 +6,24 @@ const {join} = require('path');
   try {
     const workspace = process.env.GITHUB_WORKSPACE;
 
-    const repo = getInput('repo');
-    const uri = getInput('uri');
+    const remote = getInput('remote');
+    const folderUri = getInput('folderUri');
     const command = getInput('command');
 
-    if (!repo && !uri) {
-      error("'repo' or 'uri' required.");
+    if (!remote && !folderUri) {
+      error("'remote' or 'folderUri' required.");
       setOutput('status', 'failure');
       return;
     }
 
-    const branch = getInput('branch');
-    const goto = getInput('goto');
+    if (remote) {
+      await exec(command, ['-n', '--remote', remote, getInput('path')]);
+    }
 
-    const folderUri = repo ? join(workspace, repo, branch) : getInput('uri');
-    const gotoPath = (goto && goto !== '') ? ['--goto', join(workspace, goto)] : [];
+    if (folderUri) {
+      await exec(command, ['-n', '--folder-uri', folderUri]);
+    }
 
-    await exec(command, ['-n', '--folder-uri', folderUri, ...gotoPath]);
     setOutput('status', 'success');
   } catch (e) {
     error(e);

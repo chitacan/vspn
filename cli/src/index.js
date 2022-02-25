@@ -15,14 +15,19 @@ class VspnCommand extends Command {
     this.self = hostname().replace('.local', '')
   }
 
-  getURI() {
-    const {args} = this.parse(VspnCommand)
+  buildOptions(flags, args) {
+    console.log(args.path)
     if (args.path.startsWith(GITHUB_URL)) {
       const url = new URL(args.path)
       const [owner, repo] = url.pathname.split('/').filter(d => d)
-      return `vscode-vfs://github/${owner}/${repo}`
+      return {
+        folderUri: `vscode-vfs://github/${owner}/${repo}`
+      }
     } else {
-      return `vscode-remote://ssh-remote+${this.self}${args.path}`
+      return {
+        path: args.path,
+        remote: `ssh-remote+${this.self}`
+      }
     }
   }
 
@@ -31,9 +36,12 @@ class VspnCommand extends Command {
     const [repo, owner] = (flags.slug || repository.url.replace('.git', '')).split('/').reverse()
     const slug = {owner, repo}
     const workflowFile = `run_vscode_${args.host}.yml`
-    const uri = this.getURI() 
-    const requestId = createHash('sha1').update(uri + new Date()).digest('hex')
+    const requestId = createHash('sha1').update(args.path + new Date()).digest('hex')
     const configPath = join(homedir(), '/.config/gh/hosts.yml')
+    const inputs = {
+      requestId,
+      ...this.buildOptions(flags, args)
+    }
 
     if (args.host === this.self) {
       throw new Error(`open on ${this.self} is not allowed. (you are on ${this.self})`)
@@ -68,10 +76,7 @@ class VspnCommand extends Command {
         ...slug,
         workflow_id: workflowFile,
         ref: 'master',
-        inputs: {
-          requestId,
-          uri
-        }
+        inputs
       })
       cli.action.task.action = 'workflow dispatched'
 
@@ -94,7 +99,7 @@ class VspnCommand extends Command {
         }, 2000)
       })
     } else {
-      this.log(uri)
+      this.log(inputs)
     }
   }
 }
@@ -123,6 +128,8 @@ VspnCommand.args = [
     parse: (input) => {
       if (input === '.') {
         return process.cwd()
+      } else if (input.startsWith(GITHUB_URL)) {
+        return input
       }
       return resolve(process.cwd(), input)
     },

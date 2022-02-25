@@ -1,6 +1,6 @@
 # vspn
 
-> Open vscode on [self-hosted runner](https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/about-self-hosted-runners).
+> Open vscode via [self-hosted runner](https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/about-self-hosted-runners).
 
 ## How it works
 

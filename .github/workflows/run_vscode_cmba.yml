@@ -5,15 +5,12 @@ on:
       requestId:
         description: request id
         required: true
-      repo:
-        description: repo
-      branch:
-        description: branch
-      uri:
-        description: uri to open with vscode
-      goto:
-        description: open file
-        default: ''
+      path:
+        description: path
+      remote:
+        description: vscode's "--remote" option
+      folderUri:
+        description: vscode's "--folder-uri" option
 
 jobs:
   run_vscode:
@@ -25,32 +22,14 @@ jobs:
           requestId: ${{ github.event.inputs.requestId }}
           status: started
 
-      - name: checkout
-        if: ${{ github.event.inputs.repo }}
-        uses: actions/checkout@v2
-        with:
-          repository: ${{ github.event.inputs.repo }}
-          ref: ${{ github.event.inputs.branch }}
-          path: ${{ github.event.inputs.repo }}/${{ github.event.inputs.branch }}
-          token: ${{ secrets.REPO_TOKEN }}
-          fetch-depth: 50
-
-      - name: status checkout
-        if: ${{ github.event.inputs.repo }}
-        uses: chitacan/vspn/actions/status@master
-        with:
-          requestId: ${{ github.event.inputs.requestId }}
-          status: checkout
-
       - name: open vscode
         id: open_vscode
         uses: chitacan/vspn/actions/vscode@master
         continue-on-error: true
         with:
-          uri: ${{ github.event.inputs.uri }}
-          repo: ${{ github.event.inputs.repo }}
-          goto: ${{ github.event.inputs.goto }}
-          branch: ${{ github.event.inputs.branch }}
+          path: ${{ github.event.inputs.path }}
+          remote: ${{ github.event.inputs.remote }}
+          folderUri: ${{ github.event.inputs.folderUri }}
         env:
           RUNNER_TRACKING_ID: ""
 
