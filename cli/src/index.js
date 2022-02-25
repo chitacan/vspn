@@ -16,7 +16,6 @@ class VspnCommand extends Command {
   }
 
   buildOptions(flags, args) {
-    console.log(args.path)
     if (args.path.startsWith(GITHUB_URL)) {
       const url = new URL(args.path)
       const [owner, repo] = url.pathname.split('/').filter(d => d)
