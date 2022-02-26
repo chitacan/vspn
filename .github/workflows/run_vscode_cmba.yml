@@ -16,25 +16,12 @@ jobs:
   run_vscode:
     runs-on: [self-hosted, cmba]
     steps:
-      - name: status started
-        uses: chitacan/vspn/actions/status@master
-        with:
-          requestId: ${{ github.event.inputs.requestId }}
-          status: started
-
       - name: open vscode
         id: open_vscode
         uses: chitacan/vspn/actions/vscode@master
-        continue-on-error: true
         with:
           path: ${{ github.event.inputs.path }}
           remote: ${{ github.event.inputs.remote }}
           folderUri: ${{ github.event.inputs.folderUri }}
         env:
           RUNNER_TRACKING_ID: ""
-
-      - name: status result
-        uses: chitacan/vspn/actions/status@master
-        with:
-          requestId: ${{ github.event.inputs.requestId }}
-          status: ${{ steps.open_vscode.outputs.status }}

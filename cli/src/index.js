@@ -77,26 +77,7 @@ class VspnCommand extends Command {
         ref: 'master',
         inputs
       })
-      cli.action.task.action = 'workflow dispatched'
-
-      await new Promise((resolve, reject) => {
-        const id = setInterval(async () => {
-          const {status} = await fetch(`https://vspn.chitacan.io/api/status?requestId=${requestId}`)
-            .then(res => res.json())
-            .catch(() => ({status: 'failure'}))
-          cli.action.task.action = `runner status: ${status}`
-
-          if (status === 'success') {
-            clearInterval(id)
-            cli.action.stop('done')
-            resolve()
-          } else if (status === 'failure') {
-            clearInterval(id)
-            cli.action.stop('error')
-            reject()
-          }
-        }, 2000)
-      })
+      cli.action.stop('done')
     } else {
       this.log(inputs)
     }
