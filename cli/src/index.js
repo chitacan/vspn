@@ -77,7 +77,7 @@ class VspnCommand extends Command {
         ref: 'master',
         inputs
       })
-      cli.action.stop('done')
+      cli.action.stop('requested')
     } else {
       this.log(inputs)
     }
