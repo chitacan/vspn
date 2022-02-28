@@ -3,11 +3,13 @@ const {cli} = require('cli-ux')
 const {Octokit} = require("@octokit/rest")
 const {safeLoad} = require('js-yaml')
 const {homedir, hostname} = require('os')
-const {join, basename, resolve} = require('path')
+const {join, basename, resolve, extname} = require('path')
 const {createHash} = require('crypto')
 const fetch = require('node-fetch')
 const {readFileSync, existsSync} = require('fs')
+const fg = require('fast-glob')
 const {description, repository} = require('../package')
+
 const GITHUB_URL = 'https://github.com'
 
 class VspnCommand extends Command {
@@ -15,16 +17,22 @@ class VspnCommand extends Command {
     this.self = hostname().replace('.local', '')
   }
 
-  buildOptions(flags, args) {
-    if (args.path.startsWith(GITHUB_URL)) {
-      const url = new URL(args.path)
+  buildOptions(path) {
+    if (path.startsWith(GITHUB_URL)) {
+      const url = new URL(path)
       const [owner, repo] = url.pathname.split('/').filter(d => d)
       return {
         folderUri: `vscode-vfs://github/${owner}/${repo}`
       }
-    } else {
+    } else if (extname(path) === '.code-workspace') {
       return {
-        path: args.path,
+        path: path,
+        remote: `ssh-remote+${this.self}`
+      }
+    } else {
+      const [workspaceFile] = fg.sync(join(process.cwd(), '*.code-workspace'))
+      return {
+        path: workspaceFile || path,
         remote: `ssh-remote+${this.self}`
       }
     }
@@ -39,7 +47,7 @@ class VspnCommand extends Command {
     const configPath = join(homedir(), '/.config/gh/hosts.yml')
     const inputs = {
       requestId,
-      ...this.buildOptions(flags, args)
+      ...this.buildOptions(args.path)
     }
 
     if (args.host === this.self) {
