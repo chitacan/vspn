@@ -4,7 +4,8 @@
 
 ## How it works
 
-[![image](https://user-images.githubusercontent.com/286950/155851242-efb381f0-bd5a-4988-9c17-5f0207aad71d.png)](https://excalidraw.com/#json=oXYisz4cJbHrOf6CRuOF2,MMxk9Xc9SOEgAVZPlK_LSg)
+![image](https://user-images.githubusercontent.com/286950/189660536-2f0cfcd5-d5fb-4241-979c-753fb0128833.png#gh-light-mode-only)
+![image](https://user-images.githubusercontent.com/286950/189660783-3416afbd-6d82-4015-9001-5586c93e274c.png#gh-dark-mode-only)
 
 [cli](./cli)
 
