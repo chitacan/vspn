@@ -30,7 +30,7 @@ class VspnCommand extends Command {
         remote: `ssh-remote+${this.self}`
       }
     } else {
-      const [workspaceFile] = fg.sync(join(process.cwd(), '*.code-workspace'))
+      const [workspaceFile] = fg.sync(join(path, '*.code-workspace'))
       return {
         path: workspaceFile || path,
         remote: `ssh-remote+${this.self}`
