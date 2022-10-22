@@ -1,7 +1,7 @@
 {
   "name": "vspn",
   "description": "Open remote SSHed vscode on self-hosted runner",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": "Kyung Yeol Kim @chitacan",
   "bin": {
     "vspn": "./bin/run"
