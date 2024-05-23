@@ -4,8 +4,10 @@
 
 ## How it works
 
-![image](https://user-images.githubusercontent.com/286950/189660536-2f0cfcd5-d5fb-4241-979c-753fb0128833.png#gh-light-mode-only)
-![image](https://user-images.githubusercontent.com/286950/189660783-3416afbd-6d82-4015-9001-5586c93e274c.png#gh-dark-mode-only)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/286950/189660783-3416afbd-6d82-4015-9001-5586c93e274c.png">
+  <img alt="" src="https://user-images.githubusercontent.com/286950/189660536-2f0cfcd5-d5fb-4241-979c-753fb0128833.png">
+</picture>
 
 [cli](./cli)
 
