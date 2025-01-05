@@ -1,5 +1,6 @@
 const {getInput, error, setOutput} = require("@actions/core");
 const {exec} = require("@actions/exec");
+const {runAppleScript} = require('run-applescript');
 const {join} = require('path');
 
 (async () => {
