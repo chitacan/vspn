@@ -8,9 +8,13 @@ const {createHash} = require('crypto')
 const fetch = require('node-fetch')
 const {readFileSync, existsSync} = require('fs')
 const fg = require('fast-glob')
+const {exec} = require('child_process')
+const {promisify} = require('util');
 const {description, repository} = require('../package')
 
 const GITHUB_URL = 'https://github.com'
+
+const execAsync = promisify(exec)
 
 class VspnCommand extends Command {
   async init() {
@@ -62,9 +66,8 @@ class VspnCommand extends Command {
     if (!existsSync(configPath)) {
       throw new Error(`cannot find gh config. install gh (https://cli.github.com/) and login first.`)
     }
-    const config = safeLoad(readFileSync(configPath))
-    const auth = config['github.com'].oauth_token
 
+    const auth = await execAsync('gh auth token').then(d => d.stdout.trim())
     const octokit = new Octokit({ auth })
 
     const {data: {workflows}} = await octokit.actions.listRepoWorkflows(slug)
