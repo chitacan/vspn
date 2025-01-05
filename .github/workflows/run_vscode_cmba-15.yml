@@ -1,0 +1,29 @@
+name: run vscode on cmba-15
+on:
+  workflow_dispatch:
+    inputs:
+      requestId:
+        description: request id
+      command:
+        description: command
+      path:
+        description: path
+      remote:
+        description: vscode's "--remote" option
+      folderUri:
+        description: vscode's "--folder-uri" option
+
+jobs:
+  run_vscode:
+    runs-on: [self-hosted, cmba-15]
+    steps:
+      - name: open vscode
+        id: open_vscode
+        uses: chitacan/vspn/actions/vscode@master
+        with:
+          command: ${{ github.event.inputs.command }}
+          path: ${{ github.event.inputs.path }}
+          remote: ${{ github.event.inputs.remote }}
+          folderUri: ${{ github.event.inputs.folderUri }}
+        env:
+          RUNNER_TRACKING_ID: ""
