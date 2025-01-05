@@ -17,12 +17,17 @@ class VspnCommand extends Command {
     this.self = hostname().replace('.local', '')
   }
 
-  buildOptions(path) {
+  buildOptions(path, runWithVSCode) {
     if (path.startsWith(GITHUB_URL)) {
       const url = new URL(path)
       const [owner, repo] = url.pathname.split('/').filter(d => d)
       return {
         folderUri: `vscode-vfs://github/${owner}/${repo}`
+      }
+    } else if (!runWithVSCode) {
+      return {
+        command: 'arc',
+        path: join('tunnel', this.self, path).toLowerCase()
       }
     } else if (extname(path) === '.code-workspace') {
       return {
@@ -47,7 +52,7 @@ class VspnCommand extends Command {
     const configPath = join(homedir(), '/.config/gh/hosts.yml')
     const inputs = {
       requestId,
-      ...this.buildOptions(args.path)
+      ...this.buildOptions(args.path, flags.code)
     }
 
     if (args.host === this.self) {
@@ -87,6 +92,8 @@ class VspnCommand extends Command {
       })
       cli.action.stop('requested')
     } else {
+      this.log(slug)
+      this.log(workflowFile)
       this.log(inputs)
     }
   }
@@ -101,6 +108,7 @@ VspnCommand.flags = {
     char: 's',
     description: 'workflow slug <OWNER>/<REPO>'
   }),
+  code: flags.boolean({char: 'c'}),
   'dry-run': flags.boolean({char: 'd'})
 }
 
