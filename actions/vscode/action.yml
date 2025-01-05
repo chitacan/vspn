@@ -8,7 +8,7 @@ inputs:
   folderUri:
     description: vscode's "--folder-uri" option
   command:
-    description: code or code-insiders
+    description: code or code-insiders or arc
     default: code
 
 outputs:

@@ -10,10 +10,27 @@ const {join} = require('path');
     const folderUri = getInput('folderUri');
     const command = getInput('command');
 
-    if (!remote && !folderUri) {
-      error("'remote' or 'folderUri' required.");
+    if (command !== 'arc' && !remote && !folderUri) {
+      error("'command' or 'remote' or 'folderUri' required.");
       setOutput('status', 'failure');
       return;
+    }
+
+    if (command === 'arc') {
+      const url = `https://vscode.dev/${getInput('path')}`
+      await runAppleScript(`
+        tell application "Arc"
+          if (count of windows) is 0 then
+            make new window
+          end if
+
+          tell front window
+            make new tab with properties {URL: "${url}"}
+          end tell
+
+          activate
+        end tell
+      `)
     }
 
     if (remote) {
