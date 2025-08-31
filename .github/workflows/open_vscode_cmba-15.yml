@@ -1,0 +1,31 @@
+name: open vscode on cmba-15 browser
+on:
+  workflow_dispatch:
+    inputs:
+      directory:
+        description: directory to open
+      profile:
+        description: vscode profile
+        type: choice
+        default: Default
+        options:
+          - Default
+          - momenti
+          - spectral
+          - raycast
+
+      host:
+        description: hostname
+        type: choice
+        default: cmms
+        options:
+          - cmms
+          - cmba-15
+
+jobs:
+  open_vscode:
+    runs-on: [self-hosted, cmba-15]
+    steps:
+      - name: open vscode in browser
+        run:
+          open -a Arc https://vscode.dev/tunnel/${{ github.event.inputs.host }}${{ github.event.inputs.directory }}?payload=%5b%5b%22profile%22%2c%22${{ github.event.inputs.profile }}%22%5d%5d

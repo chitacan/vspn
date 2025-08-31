@@ -1,12 +1,10 @@
 const {Command, flags} = require('@oclif/command')
 const {cli} = require('cli-ux')
 const {Octokit} = require("@octokit/rest")
-const {safeLoad} = require('js-yaml')
 const {homedir, hostname} = require('os')
 const {join, basename, resolve, extname} = require('path')
 const {createHash} = require('crypto')
-const fetch = require('node-fetch')
-const {readFileSync, existsSync} = require('fs')
+const {existsSync} = require('fs')
 const fg = require('fast-glob')
 const {exec} = require('child_process')
 const {promisify} = require('util');

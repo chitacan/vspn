@@ -1,0 +1,138 @@
+name: clone & open vscode on cmba-15 browser
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: repo url
+      profile:
+        description: vscode profile
+        type: choice
+        default: Default
+        options:
+          - Default
+          - momenti
+          - spectral
+          - raycast
+
+      host:
+        description: hostname
+        type: choice
+        default: cmms
+        options:
+          - cmms
+          - cmba-15
+
+jobs:
+  clone_repo:
+    runs-on: [self-hosted, cmms]
+    outputs:
+      workspacePath: ${{ steps.create_context.outputs.workspacePath }}
+    steps:
+      - name: check repo
+        id: check_repo
+        uses: actions/github-script@v7
+        env:
+          URL: ${{ github.event.inputs.url }}
+        with:
+          script: |
+            const {existsSync} = require('fs');
+            const {basename} = require('path');
+
+            const url = new URL(process.env.URL);
+            const repo = basename(url.pathname);
+
+            const exists = existsSync(`~/git/${repo}`);
+
+            core.setOutput('repo', repo);
+            core.setOutput('exists', exists);
+
+      - name: check default branch
+        id: default_branch
+        run: |
+          VALUE=$(gh api repos/nallwhy/elixirconf-us-2025-chatbot-demo --jq .default_branch)
+          echo "value=$VALUE" >> $GITHUB_OUTPUT
+
+      - name: clone repo
+        if: steps.check_repo.outputs.exists == false
+        run: |
+          cd ~/git
+          git clone ${{ github.event.inputs.url }} ${{ steps.check_repo.outputs.repo}}/${{ steps.default_branch.outputs.value }}
+
+      - name: create context
+        id: create_context
+        if: steps.check_repo.outputs.exists == false
+        uses: actions/github-script@v7
+        env:
+          REPO: ${{ steps.check_repo.outputs.repo }}
+          DEFAULT_BRANCH: ${{ steps.default_branch.outputs.value }}
+        with:
+          script: |
+            const {homedir} = require('os');
+            const {join} = require('path');
+            const {mkdirSync, existsSync, writeFileSync} = require('fs');
+
+            const repo = process.env.REPO;
+            const defaultBranch = process.env.DEFAULT_BRANCH;
+
+            const repoPath = join(homedir(), 'git', repo);
+            const contextPath = join(repoPath, 'context');
+            const workspacesPath = join(contextPath, 'workspaces');
+            const workspacePath = join(workspacesPath, `${defaultBranch}.code-workspace`);
+
+            if (!existsSync(contextPath)) {
+              mkdirSync(contextPath);
+              mkdirSync(workspacesPath);
+
+              writeFileSync(workspacePath, JSON.stringify({
+                folders: [
+                  {
+                    name: "context",
+                    path: "../"
+                  },
+                  {
+                    name: defaultBranch,
+                    path: `../../${defaultBranch}`
+                  },
+                ],
+                settings: {}
+              }, null, 2));
+            }
+
+            core.setOutput('workspacePath', workspacePath);
+
+      - name: check workspace 
+        id: check_workspace
+        uses: actions/github-script@v7
+        if: steps.check_repo.outputs.exists == true
+        env:
+          REPO: ${{ steps.check_repo.outputs.repo }}
+          DEFAULT_BRANCH: ${{ steps.default_branch.outputs.value }}
+        with:
+          script: |
+            const {homedir} = require('os');
+            const {join} = require('path');
+            const {existsSync} = require('fs');
+
+            const repo = process.env.REPO;
+            const defaultBranch = process.env.DEFAULT_BRANCH;
+
+            const workspacePath = join(
+              homedir(),
+              'git',
+              repo,
+              'context',
+              'workspaces',
+              `${defaultBranch}.code-workspace`
+            );
+
+            if (!existsSync(workspacePath)) {
+              core.setFailed(`workspace does not exists, (${workspacePath})`)
+            }
+
+  open_vscode:
+    runs-on: [self-hosted, cmba-15]
+    needs: clone_repo
+    steps:
+      - name: open vscode in browser
+        run:
+          open -a Arc "https://vscode.dev/tunnel/${{ github.event.inputs.host }}${{ needs.clone_repo.outputs.workspacePath }}?payload=%5b%5b%22profile%22%2c%22${{ github.event.inputs.profile }}%22%5d%5d"I
